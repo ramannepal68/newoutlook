@@ -1,0 +1,43 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Microsoft Login - Public Client</title>
+</head>
+<body>
+  <h1>Microsoft OAuth - Public Client Flow</h1>
+  <button onclick="startLogin()">Login with Microsoft</button>
+  <pre id="output"></pre>
+
+  <script>
+    const clientId = 'YOUR_CLIENT_ID';
+    const redirectUri = window.location.origin;
+
+    function startLogin() {
+      const authUrl = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize' +
+        '?client_id=' + clientId +
+        '&response_type=code' +
+        '&redirect_uri=' + encodeURIComponent(redirectUri) +
+        '&scope=offline_access https://graph.microsoft.com/Mail.Read' +
+        '&response_mode=query';
+
+      window.location.href = authUrl;
+    }
+
+    async function exchangeCode(code) {
+      const response = await fetch('/api/token?code=' + code);
+      const data = await response.json();
+      document.getElementById('output').innerText = JSON.stringify(data, null, 2);
+    }
+
+    // Check for authorization code in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('code')) {
+      const code = urlParams.get('code');
+      exchangeCode(code);
+    }
+  </script>
+</body>
+</html>
